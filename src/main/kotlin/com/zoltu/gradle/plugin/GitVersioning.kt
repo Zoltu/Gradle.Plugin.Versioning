@@ -20,7 +20,7 @@ class GitVersioning : Plugin<Project> {
 	fun getVersionInfo(rootDirectory: File): VersionInfo {
 		val repository = FileRepositoryBuilder().findGitDir(rootDirectory).build()
 		val git = Git.wrap(repository)
-		val describeResults = git.describe().setLong(true).call()
+		val describeResults = git.describe().setLong(true).call() ?: throw Exception("Your repository must have at least one tag in it with the format `v1.2`.")
 		val regex = Regex("""v([0-9]+)\.([0-9]+)\-([0-9]+)\-g(.*)""")
 		val match = regex.matchEntire(describeResults) ?: throw Exception("Git describe didn't return the expected format.")
 		val major = match.groups[1]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 1.")
