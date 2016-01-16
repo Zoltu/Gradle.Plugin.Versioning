@@ -16,6 +16,8 @@ repositories {
 	jcenter()
 }
 
+sourceSets.main.java.srcDirs = []
+
 dependencies {
 	compile(gradleApi())
 	compile(group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.0.0-beta-4584')
