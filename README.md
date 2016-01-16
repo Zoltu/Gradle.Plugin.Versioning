@@ -1,4 +1,5 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/x1xa4ilqfllewosp/branch/master?svg=true)](https://ci.appveyor.com/project/Zoltu/gradle-plugin-versioning/branch/master)
+[License](https://img.shields.io/github/license/Zoltu/Gradle.Plugin.Versioning.svg)
 
 # Gradle.Plugin.Versioning
 A Gradle plugin for automatically generating versions from git tags and commits.
