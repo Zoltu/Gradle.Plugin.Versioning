@@ -18,8 +18,8 @@ class GitVersioning : Plugin<Project> {
 	}
 
 	fun getVersionInfo(rootDirectory: File): VersionInfo {
-		val repository = FileRepositoryBuilder().findGitDir(rootDirectory).build()
-		val git = Git.wrap(repository)
+		val repository = FileRepositoryBuilder().findGitDir(rootDirectory)!!.build()!!
+		val git = Git.wrap(repository)!!
 		val describeResults = git.describe().setLong(true).call() ?: throw Exception("Your repository must have at least one tag in it with the format `v1.2`.")
 		val regex = Regex("""v([0-9]+)\.([0-9]+)\-([0-9]+)\-g(.*)""")
 		val match = regex.matchEntire(describeResults) ?: throw Exception("Git describe didn't return the expected format.")
@@ -43,6 +43,6 @@ class GitVersioning : Plugin<Project> {
 				attributes.put("Specification-Version", "${versionInfo.major}.${versionInfo.minor}")
 			}
 		}
-		project.tasks.withType(Jar::class.java, MethodClosure(closure, "apply"))
+		(project.tasks ?: throw Exception("The project has no tasks.")).withType(Jar::class.java, MethodClosure(closure, "apply"))
 	}
 }
