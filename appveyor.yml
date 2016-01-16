@@ -1,0 +1,24 @@
+cache:
+  - C:\Users\appveyor\.gradle -> **\*.gradle
+
+build:
+  verbosity: detailed
+
+build_script:
+  - gradlew.bat jar --info --no-daemon
+
+test_script:
+  - gradlew.bat check --info --no-daemon
+
+artifacts:
+  - path: build\libs\**.jar
+
+deploy_script:
+  - gradlew.bat publishPlugins
+
+environment:
+  JAVA_HOME: C:\Program Files (x86)\Java\jdk1.8.0
+  GRADLE_PUBLISH_KEY:
+    secure: sL5CYreT70sPtW5F4AB9JnMHqPrxrkM3Ocgo0kCO9EyxoPCj+nTFfnlPDbYsEDeH
+  GRADLE_PUBLISH_SECRET:
+    secure: gKG3Po2JTxz5RecWt2UVN/a4sQ93d4HZ8AUvtHbpsOtYLGQPWxM2JRAjMx1fVxZe
