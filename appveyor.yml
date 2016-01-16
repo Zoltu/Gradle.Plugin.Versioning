@@ -15,12 +15,8 @@ test_script:
 artifacts:
   - path: build\libs\**.jar
 
--
-  branches:
-    only:
-      - master
-  deploy_script:
-    - gradlew.bat publishPlugins
+deploy_script:
+  - gradlew.bat publishPlugins
 
 environment:
   JAVA_HOME: C:\Program Files (x86)\Java\jdk1.8.0
