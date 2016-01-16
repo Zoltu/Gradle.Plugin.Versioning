@@ -35,7 +35,7 @@ pluginBundle {
 
 	plugins {
 		gitVersioningPlugin {
-			id = 'com.zoltu.gradle.plugin'
+			id = 'com.zoltu.gradle.plugin.git-versioning'
 			displayName = 'Git Versioning'
 			description = 'Automatically bumps your minor version with every git commit and gets major/minor from git tags.  Also sets version in Java manifest.'
 			tags = ['version', 'versioning', 'git', 'describe', 'git describe']
