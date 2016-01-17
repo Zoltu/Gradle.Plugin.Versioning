@@ -1,15 +1,16 @@
+import com.zoltu.SimpleGradlePluginPublishConfiguration
+
 buildscript {
 	repositories.jcenter()
 	dependencies.classpath(group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: '1.0.0-beta-4584')
 }
 
 plugins {
-	id 'com.gradle.plugin-publish' version '0.9.3'
-	id 'com.zoltu.gradle.plugin.git-versioning' version '1.0.9'
+	id 'com.zoltu.git-versioning' version '1.0.12'
+	id 'com.zoltu.simple-gradle-plugin-publisher' version '1.0.3'
 }
 
 apply plugin: 'kotlin'
-apply from: 'publish.gradle'
 
 repositories {
 	jcenter()
@@ -27,3 +28,13 @@ sourceSets.test.java.srcDirs = []
 sourceSets.test.resources.srcDirs = []
 
 group 'com.zoltu.gradle.plugin'
+
+simpleGradlePluginPublishConfiguration {
+	gradlePublishKey = System.getenv('GRADLE_PUBLISH_KEY')
+	gradlePublishSecret = System.getenv('GRADLE_PUBLISH_SECRET')
+	vcsUrl = 'https://github.com/Zoltu/Gradle.Plugin.Versioning'
+	id = 'com.zoltu.git-versioning'
+	displayName = 'Git Versioning'
+	description = 'Automatically bumps your patch version with every git commit and gets major/minor version from git tags.  Also sets version information and SHA in Java manifest.'
+	tags = ['version', 'versioning', 'git', 'describe', 'git describe']
+}
