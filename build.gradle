@@ -14,12 +14,15 @@ apply plugin: 'kotlin'
 
 repositories {
 	jcenter()
+	maven { url("http://repository.jetbrains.com/all") }
 }
 
 dependencies {
 	compile(gradleApi())
 	compile(group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.0.0-beta-4584')
 	compile(group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.1.1.201511131810-r')
+
+	testCompile(group: 'org.jetbrains.spek', name: 'spek', version: '0.1.188')
 }
 
 // un-set the java source directories since this is a pure kotlin project
