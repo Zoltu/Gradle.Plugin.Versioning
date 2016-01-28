@@ -2,6 +2,9 @@ cache:
   - C:\Users\appveyor\.gradle -> **\*.gradle
 
 skip_tags: true
+branches:
+  only:
+    - master
 
 build:
   verbosity: detailed
