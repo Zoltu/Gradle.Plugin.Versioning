@@ -23,13 +23,14 @@ class GitVersioning : Plugin<Project> {
 	}
 
 	private fun getSimpleVersionInfo(describeResults: String): VersionInfo {
-		val regex = Regex("""v([0-9]+?)\.([0-9]+?)\-([0-9]+?)\-g(.*)""")
+		val regex = Regex("""v([0-9]+?)\.([0-9]+?)(?:\-([0-9A-Za-z\.\-]+))?\-([0-9]+?)\-g(.*)""")
 		val match = regex.matchEntire(describeResults) ?: throw Exception("Git describe didn't return the expected format.")
 		val major = match.groups[1]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 1.")
 		val minor = match.groups[2]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 2.")
-		val commitCount = match.groups[3]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 3.")
-		val sha = match.groups[4]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 4.")
-		return VersionInfo(major = major, minor = minor, commitCount = commitCount, sha = sha)
+		val tags = match.groups[3]?.value
+		val commitCount = match.groups[4]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 3.")
+		val sha = match.groups[5]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 4.")
+		return VersionInfo(major = major, minor = minor, commitCount = commitCount, sha = sha, tags = tags)
 	}
 
 	private fun tryGetSemanticVersionInfo(describeResults: String): VersionInfo? {
