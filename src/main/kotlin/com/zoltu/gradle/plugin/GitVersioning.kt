@@ -50,7 +50,7 @@ class GitVersioning : Plugin<Project> {
 	private fun getGitDescribeResults(rootDirectory: File): String {
 		val repository = FileRepositoryBuilder().findGitDir(rootDirectory)!!.build()!!
 		val git = Git.wrap(repository)!!
-		return git.describe().setLong(true).call() ?: throw Exception("Your repository must have at least one tag in it.")
+		return git.describe().setLong(true).call() ?: throw Exception("Your repository must have at least one tag in it for git-versioning to work.  Recommended solution: tag the initial commit with `v0.0`.")
 	}
 
 	private fun setProjectVersion(project: Project, versionInfo: VersionInfo) {
