@@ -59,6 +59,7 @@ class GitVersioning : Plugin<Project> {
 
 	private fun setJarManifestVersion(project: Project, versionInfo: VersionInfo) {
 		val closure = object {
+			@Suppress("unused")
 			fun apply(jar: Jar) {
 				val attributes = jar.manifest?.attributes ?: throw Exception("The Jar task has no manifest.")
 				attributes.put("Implementation-Version", versionInfo.toString())
