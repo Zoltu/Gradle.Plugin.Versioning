@@ -1,11 +1,11 @@
 buildscript {
 	repositories.jcenter()
-	dependencies.classpath(group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: '1.0.0-rc-1036')
+	dependencies.classpath(group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: '1.0.0')
 }
 
 plugins {
-	id 'com.zoltu.git-versioning' version '1.0.12'
-	id 'com.zoltu.simple-gradle-plugin-publisher' version '1.0.3'
+	id 'com.zoltu.git-versioning' version '2.0.4'
+	id 'com.zoltu.simple-gradle-plugin-publisher' version '1.0.5'
 }
 
 apply plugin: 'kotlin'
@@ -17,10 +17,10 @@ repositories {
 
 dependencies {
 	compile(gradleApi())
-	compile(group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.0.0-rc-1036')
-	compile(group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.1.1.201511131810-r')
+	compile(group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.0.0')
+	compile(group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.2.0.201601211800-r')
 
-	testCompile(group: 'org.jetbrains.spek', name: 'spek', version: '0.1.194')
+	testCompile(group: 'org.jetbrains.spek', name: 'spek', version: '0.1.195')
 }
 
 // un-set the java source directories since this is a pure kotlin project
