@@ -5,7 +5,7 @@
 A Gradle plugin for automatically generating versions from git tags and commits.
 
 ## Usage
-1. Add the plugin to your build.gradle as shown [here](https://plugins.gradle.org/plugin/com.zoltu.gradle.plugin.git-versioning).
+1. Add the plugin to your build.gradle as shown [here](https://plugins.gradle.org/plugin/com.zoltu.git-versioning).
 2. Tag your repository (anywhere in history) with a tag named like `v1.2` or a semantic version tag like `v1.2.3-tag1.tag2` or something in between like `v1.2-tag1.tag2`
 3. Remove the `version` property from your `build.gradle` file.
 
