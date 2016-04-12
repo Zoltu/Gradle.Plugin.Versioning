@@ -1,5 +1,6 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/x1xa4ilqfllewosp/branch/master?svg=true)](https://ci.appveyor.com/project/Zoltu/gradle-plugin-versioning/branch/master)
 ![License](https://img.shields.io/github/license/Zoltu/Gradle.Plugin.Versioning.svg)
+[![Join the chat at https://gitter.im/Zoltu/Gradle.Plugin.Versioning](https://badges.gitter.im/Zoltu/Gradle.Plugin.Versioning.svg)](https://gitter.im/Zoltu/Gradle.Plugin.Versioning?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # Gradle.Plugin.Versioning
 A Gradle plugin for automatically generating versions from git tags and commits.
