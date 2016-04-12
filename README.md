@@ -2,6 +2,8 @@
 ![License](https://img.shields.io/github/license/Zoltu/Gradle.Plugin.Versioning.svg)
 
 # Gradle.Plugin.Versioning
+
+[![Join the chat at https://gitter.im/Zoltu/Gradle.Plugin.Versioning](https://badges.gitter.im/Zoltu/Gradle.Plugin.Versioning.svg)](https://gitter.im/Zoltu/Gradle.Plugin.Versioning?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A Gradle plugin for automatically generating versions from git tags and commits.
 
 ## Usage
