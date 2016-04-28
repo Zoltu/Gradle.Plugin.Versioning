@@ -13,6 +13,7 @@ class GitVersioning : Plugin<Project> {
 		val regexSimpleVersionInfo = Regex("""v([0-9]+?)\.([0-9]+?)(?:\-([0-9A-Za-z\.\-]+))?\-([0-9]+?)\-g(.*)""")
 		val regexSemanticVersionInfo = Regex("""v([0-9]+?)\.([0-9]+?)\.([0-9]+?)(?:\-([0-9A-Za-z\.\-]+))?\-([0-9]+?)\-g([a-zA-Z0-9]+?)""")
 	}
+
 	override fun apply(project: Project?) {
 		if (project == null) return;
 
