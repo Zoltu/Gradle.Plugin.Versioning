@@ -9,6 +9,10 @@ import org.gradle.api.tasks.bundling.Jar
 import java.io.File
 
 class GitVersioning : Plugin<Project> {
+	companion object {
+		val regexSimpleVersionInfo = Regex("""v([0-9]+?)\.([0-9]+?)(?:\-([0-9A-Za-z\.\-]+))?\-([0-9]+?)\-g(.*)""")
+		val regexSemanticVersionInfo = Regex("""v([0-9]+?)\.([0-9]+?)\.([0-9]+?)(?:\-([0-9A-Za-z\.\-]+))?\-([0-9]+?)\-g([a-zA-Z0-9]+?)""")
+	}
 	override fun apply(project: Project?) {
 		if (project == null) return;
 
@@ -23,8 +27,7 @@ class GitVersioning : Plugin<Project> {
 	}
 
 	private fun getSimpleVersionInfo(describeResults: String): VersionInfo {
-		val regex = Regex("""v([0-9]+?)\.([0-9]+?)(?:\-([0-9A-Za-z\.\-]+))?\-([0-9]+?)\-g(.*)""")
-		val match = regex.matchEntire(describeResults) ?: throw Exception("Git describe didn't return the expected format.")
+		val match = regexSimpleVersionInfo.matchEntire(describeResults) ?: throw Exception("Git describe didn't return the expected format.")
 		val major = match.groups[1]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 1.")
 		val minor = match.groups[2]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 2.")
 		val tags = match.groups[3]?.value
@@ -34,8 +37,7 @@ class GitVersioning : Plugin<Project> {
 	}
 
 	private fun tryGetSemanticVersionInfo(describeResults: String): VersionInfo? {
-		val regex = Regex("""v([0-9]+?)\.([0-9]+?)\.([0-9]+?)(?:\-([0-9A-Za-z\.\-]+))?\-([0-9]+?)\-g([a-zA-Z0-9]+?)""")
-		val match = regex.matchEntire(describeResults) ?: return null
+		val match = regexSemanticVersionInfo.matchEntire(describeResults) ?: return null
 
 		val major = match.groups[1]?.value ?: return null
 		val minor = match.groups[2]?.value ?: return null
