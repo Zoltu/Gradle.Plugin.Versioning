@@ -16,7 +16,9 @@ class GitVersioning : Plugin<Project> {
 
 	override fun apply(project: Project?) {
 		if (project == null) return;
-		project.task("version").doLast { println("version ${project.version}") }
+
+		project.task("version").doLast { println("Version: ${project.version}") }
+
 		val describeResults = getGitDescribeResults(project.rootDir)
 		val versionInfo = getVersionInfo(describeResults)
 		setProjectVersion(project, versionInfo)
