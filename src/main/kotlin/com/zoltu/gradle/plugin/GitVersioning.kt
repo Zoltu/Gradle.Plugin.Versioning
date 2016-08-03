@@ -34,8 +34,8 @@ class GitVersioning : Plugin<Project> {
 		val major = match.groups[1]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 1.")
 		val minor = match.groups[2]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 2.")
 		val tags = match.groups[3]?.value
-		val commitCount = match.groups[4]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 3.")
-		val sha = match.groups[5]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 4.")
+		val commitCount = match.groups[4]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 4.")
+		val sha = match.groups[5]?.value ?: throw Exception("Git describe matched the expected format but the matcher didn't return group 5.")
 		return VersionInfo(major = major, minor = minor, commitCount = commitCount, sha = sha, tags = tags)
 	}
 
