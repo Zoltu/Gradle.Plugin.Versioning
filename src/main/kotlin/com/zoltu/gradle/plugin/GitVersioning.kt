@@ -80,5 +80,5 @@ class GitVersioning : Plugin<Project> {
 		project.extensions.create("ZoltuGitVersioning", Extension::class.java, versionInfo)
 	}
 
-	data class Extension(val versionInfo: VersionInfo)
+	open class Extension(open val versionInfo: VersionInfo)
 }
