@@ -1,4 +1,5 @@
 import com.zoltu.gradle.plugin.GitVersioning
+import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.spek.api.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -79,4 +80,17 @@ class Tests : Spek({
 			}
 		}
 	}
+
+	// unfortunately, this test fails unless you swap out the call to `getGitDescribeResults(project.rootDir)` with `"v2.0-23-gee473b7"` because the test doesn't have a git directory in its path hierarchy
+//	given("a project") {
+//		val project = ProjectBuilder.builder().build()
+//
+//		on("applying the plugin") {
+//			project.pluginManager.apply(GitVersioning::class.java)
+//
+//			it("has access to the extension") {
+//				assertNotNull(project.extensions.getByName("ZoltuGitVersioning") as GitVersioning.Extension)
+//			}
+//		}
+//	}
 }) {}
