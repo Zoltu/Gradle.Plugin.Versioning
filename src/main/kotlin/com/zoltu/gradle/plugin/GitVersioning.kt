@@ -15,12 +15,13 @@ class GitVersioning : Plugin<Project> {
 	}
 
 	override fun apply(project: Project?) {
-		if (project == null) return;
+		if (project == null) return
 
 		project.task("version").doLast { println("Version: ${project.version}") }
 
 		val describeResults = getGitDescribeResults(project.rootDir)
 		val versionInfo = getVersionInfo(describeResults)
+		exposeVersionInfoToUser(project, versionInfo)
 		setProjectVersion(project, versionInfo)
 		setJarManifestVersion(project, versionInfo)
 	}
@@ -74,4 +75,10 @@ class GitVersioning : Plugin<Project> {
 		}
 		(project.tasks ?: throw Exception("The project has no tasks.")).withType(Jar::class.java, MethodClosure(closure, "apply"))
 	}
+
+	private fun exposeVersionInfoToUser(project: Project, versionInfo: VersionInfo) {
+		project.extensions.create("ZoltuGitVersioning", Extension::class.java, versionInfo)
+	}
+
+	data class Extension(val versionInfo: VersionInfo)
 }
