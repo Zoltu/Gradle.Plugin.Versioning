@@ -16,3 +16,16 @@ When you run gradle, it uses jGit to execute `git describe --long` (technically:
 * `Implementation-Version`: `{major}.{minor}.{count}` or `{major}.{minor}.{patch}-{tags}.{count}` or `{major}.{minor}.{count}-{tags}`
 * `Implementation-Sha`: `{sha}`
 * `Specification-Version`: `{major}.{minor}`
+
+## Advanced Usage
+If you want more control over how you version, you can directly access the [`VersionInfo`](https://github.com/Zoltu/Gradle.Plugin.Versioning/blob/master/src/main/kotlin/com/zoltu/gradle/plugin/VersionInfo.kt) object via the gradle project: `project.ZoltuGitVersioning.major.  Inside of your `build.gradle` this might look something like this:
+```groovy
+def versionInfo = ZoltuGitVersioning.versionInfo
+print "${versionInfo.major}.${versionInfo.minor}.${versionInfo.commitCount}"
+```
+
+Of course, you can do more advanced logic such as squashing the three values into a single number like:
+```groovy
+def versionInfo = ZoltuGitVersioning.versionInfo
+version = versionInfo.major * 10000 + versionInfo.minor * 100 + versionInfo.commitCount
+```
