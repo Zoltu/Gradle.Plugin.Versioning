@@ -27,5 +27,8 @@ print "${versionInfo.major}.${versionInfo.minor}.${versionInfo.commitCount}"
 Of course, you can do more advanced logic such as squashing the three values into a single number like:
 ```groovy
 def versionInfo = ZoltuGitVersioning.versionInfo
-version = versionInfo.major * 10000 + versionInfo.minor * 100 + versionInfo.commitCount
+def versionCode =
+	versionInfo.major.toInteger() * 10000
+	+ versionInfo.minor.toInteger() * 100
+	+ versionInfo.patch.toInteger()
 ```
