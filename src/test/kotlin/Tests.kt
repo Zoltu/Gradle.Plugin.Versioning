@@ -80,6 +80,25 @@ class Tests : Spek({
 			}
 		}
 	}
+	
+	given("a simple version without leading 'v' character result") {
+		val describeResult = "1.3.1-2-g35965aa"
+		on("tryGetSemanticVersionInfo") {
+			
+			val versionInfo = GitVersioning().getVersionInfo(describeResult)
+			
+			it("parses into expected VersionInfo") {
+				assertNotNull(versionInfo)
+				assertEquals("1", versionInfo.major)
+				assertEquals("3", versionInfo.minor)
+				assertEquals("1", versionInfo.patch)
+				assertEquals("2", versionInfo.commitCount)
+				assertEquals("35965aa", versionInfo.sha)
+				assertEquals(null, versionInfo.tags)
+				assertEquals("1.3.1-2", versionInfo.toString())
+			}
+		}
+	}
 
 	// unfortunately, this test fails unless you swap out the call to `getGitDescribeResults(project.rootDir)` with `"v2.0-23-gee473b7"` because the test doesn't have a git directory in its path hierarchy
 //	given("a project") {
