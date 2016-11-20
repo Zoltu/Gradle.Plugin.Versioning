@@ -32,3 +32,12 @@ def versionCode =
 	+ versionInfo.minor.toInteger() * 100
 	+ versionInfo.patch.toInteger()
 ```
+
+If you want to perform your own processing on the version information produced by the plugin, you may do so as follows:
+```groovy
+// With input tag '1.0.0-36'
+ZoltuGitVersioning.customVersionToString { versionInfo ->
+		"${versionInfo.major}.${versionInfo.minor}.${versionInfo.patch}.${versionInfo.commitCount}"
+}
+```
+Will produce: '1.0.0.36'
