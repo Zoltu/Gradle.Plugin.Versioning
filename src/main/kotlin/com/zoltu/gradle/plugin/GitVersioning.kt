@@ -7,6 +7,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
 import java.io.File
+import java.util.function.Function
+import kotlin.properties.Delegates.observable
 
 class GitVersioning : Plugin<Project> {
 	companion object {
@@ -14,20 +16,24 @@ class GitVersioning : Plugin<Project> {
 		val regexSemanticVersionInfo = Regex("""[v]?([0-9]+?)\.([0-9]+?)\.([0-9]+?)(?:\-([0-9A-Za-z\.\-]+))?\-([0-9]+?)\-g([a-zA-Z0-9]+?)""")
 	}
 
+	private lateinit var configuration: Configuration
+
 	override fun apply(project: Project?) {
 		if (project == null) return
 
 		project.task("version").doLast { println("Version: ${project.version}") }
-
 		val describeResults = getGitDescribeResults(project.rootDir)
-		val versionInfo = getVersionInfo(describeResults)
-		exposeVersionInfoToUser(project, versionInfo)
-		setProjectVersion(project, versionInfo)
-		setJarManifestVersion(project, versionInfo)
+		val processVersioning = {
+			configuration.versionInfo = getVersionInfo(describeResults)
+			setProjectVersion(project, configuration.versionInfo)
+			setJarManifestVersion(project, configuration.versionInfo)
+		}
+		configuration = exposeConfigurationObject(project, processVersioning)
+		processVersioning()
 	}
 
-	fun getVersionInfo(describeResults: String): VersionInfo {
-		return tryGetSemanticVersionInfo(describeResults) ?: getSimpleVersionInfo(describeResults)
+	private fun getVersionInfo(describeResults: String): VersionInfo {
+		return tryGetCustomVersionInfo(describeResults) ?: tryGetSemanticVersionInfo(describeResults) ?: getSimpleVersionInfo(describeResults)
 	}
 
 	private fun getSimpleVersionInfo(describeResults: String): VersionInfo {
@@ -53,6 +59,8 @@ class GitVersioning : Plugin<Project> {
 		return VersionInfo(major = major, minor = minor, patch = patch, tags = tags, commitCount = commitCount, sha = sha)
 	}
 
+	private fun tryGetCustomVersionInfo(describeResults: String): VersionInfo? = configuration.customDescribeProcessor.apply(describeResults)
+
 	private fun getGitDescribeResults(rootDirectory: File): String {
 		val repository = FileRepositoryBuilder()
 				.findGitDir(rootDirectory)!!
@@ -64,7 +72,7 @@ class GitVersioning : Plugin<Project> {
 	}
 
 	private fun setProjectVersion(project: Project, versionInfo: VersionInfo) {
-		project.version = versionInfo.toString()
+		project.version = configuration.customVersionToString.apply(versionInfo)
 	}
 
 	private fun setJarManifestVersion(project: Project, versionInfo: VersionInfo) {
@@ -72,7 +80,7 @@ class GitVersioning : Plugin<Project> {
 			@Suppress("unused")
 			fun apply(jar: Jar) {
 				val attributes = jar.manifest?.attributes ?: throw Exception("The Jar task has no manifest.")
-				attributes.put("Implementation-Version", versionInfo.toString())
+				attributes.put("Implementation-Version", configuration.customVersionToString.apply(versionInfo))
 				attributes.put("Implementation-Sha", versionInfo.sha)
 				attributes.put("Specification-Version", "${versionInfo.major}.${versionInfo.minor}")
 			}
@@ -80,9 +88,43 @@ class GitVersioning : Plugin<Project> {
 		(project.tasks ?: throw Exception("The project has no tasks.")).withType(Jar::class.java, MethodClosure(closure, "apply"))
 	}
 
-	private fun exposeVersionInfoToUser(project: Project, versionInfo: VersionInfo) {
-		project.extensions.create("ZoltuGitVersioning", Extension::class.java, versionInfo)
-	}
+	private fun exposeConfigurationObject(project: Project, configurationChangeCallback: () -> Unit) = project.extensions.create("ZoltuGitVersioning", Configuration::class.java, configurationChangeCallback)
 
-	open class Extension(open val versionInfo: VersionInfo)
+	open class Configuration(private val configurationChangeCallback: () -> Unit) {
+		companion object {
+			@Suppress("unused")
+			const val NAME = "versioning"
+			private val defaultVersionToString = Function<VersionInfo, String> { versionInfo: VersionInfo ->
+				val suffix = if (versionInfo.tags != null && versionInfo.patch != null) {
+					// semantic versioning
+					"${versionInfo.patch}-${versionInfo.tags}.${versionInfo.commitCount}"
+				} else if (versionInfo.patch != null) {
+					// semantic versioning
+					"${versionInfo.patch}-${versionInfo.commitCount}"
+				} else if (versionInfo.tags != null) {
+					// simple versioning
+					"${versionInfo.commitCount}-${versionInfo.tags}"
+				} else {
+					// simple versioning
+					"${versionInfo.commitCount}"
+				}
+				"${versionInfo.major}.${versionInfo.minor}.$suffix".toString()
+			}
+			private val defaultCustomDescribeProcessor = Function<String, VersionInfo?> { null }
+		}
+		/**
+		 * Contains version information for consumption.
+		 */
+		lateinit var versionInfo: VersionInfo
+
+		/**
+		 * A custom describe processor that will take in a string as input and return a VersionInfo object as output.
+		 */
+		var customDescribeProcessor: Function<String, VersionInfo?> by observable(defaultCustomDescribeProcessor, { property, old, new -> configurationChangeCallback() })
+
+		/**
+		 * A custom toString for VersionInfo that will take in a VersionInfo as input and return a string as output.
+		 */
+		var customVersionToString: Function<VersionInfo, String> by observable(defaultVersionToString, { property, old, new -> configurationChangeCallback() })
+	}
 }

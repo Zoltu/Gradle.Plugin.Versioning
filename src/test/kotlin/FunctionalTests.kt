@@ -8,6 +8,7 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class FunctionalTests {
@@ -79,6 +80,135 @@ class FunctionalTests {
 		assertTrue(result.output.contains("Git describe didn't return the expected format."))
 	}
 
+	@Test
+	fun `semantic version with tags`() {
+		// arrange
+		initializeGit("v1.2.3-beta-4.5").createFakeCommits(2)
+		initializeBuildGradle()
+
+		// act
+		val result = runVersionTaskExpectingSuccess()
+
+		// assert
+		assertTrue(result.output.contains("Version: 1.2.3-beta-4.5.2"))
+	}
+
+	@Test
+	fun `semantic version without tags`() {
+		// arrange
+		initializeGit("v1.2.3").createFakeCommits(3)
+		initializeBuildGradle()
+
+		// act
+		val result = runVersionTaskExpectingSuccess()
+
+		// assert
+		assertTrue(result.output.contains("Version: 1.2.3-3"))
+	}
+
+	@Test
+	fun `simple version with tags`() {
+		// arrange
+		initializeGit("v1.2-tag-1.tag2.4").createFakeCommits(3)
+		initializeBuildGradle()
+
+		// act
+		val result = runVersionTaskExpectingSuccess()
+
+		// assert
+		assertTrue(result.output.contains("Version: 1.2.3-tag-1.tag2.4"))
+	}
+
+	@Test
+	fun `simple version without tags`() {
+		// arrange
+		initializeGit("v1.2").createFakeCommits(3)
+		initializeBuildGradle()
+
+		// act
+		val result = runVersionTaskExpectingSuccess()
+
+		// assert
+		assertTrue(result.output.contains("Version: 1.2.3"))
+	}
+
+	@Test
+	fun `simple version without leading v without tags`() {
+		// arrange
+		initializeGit("1.2").createFakeCommits(3)
+		initializeBuildGradle()
+
+		// act
+		val result = runVersionTaskExpectingSuccess()
+
+		// assert
+		assertTrue(result.output.contains("Version: 1.2.3"))
+	}
+	@Test
+	fun `simple version without leading v with tags`() {
+		// arrange
+		initializeGit("1.2-tag-1.tag2.4").createFakeCommits(3)
+		initializeBuildGradle()
+
+		// act
+		val result = runVersionTaskExpectingSuccess()
+
+		// assert
+		assertTrue(result.output.contains("Version: 1.2.3-tag-1.tag2.4"))
+	}
+
+	@Test
+	fun `version info ends up in configuration`() {
+		// arrange
+		initializeGit("v1.2").createFakeCommits(9)
+		initializeBuildGradle("""
+plugins { id 'com.zoltu.git-versioning' }
+println "Commit Count: ${'$'}{ZoltuGitVersioning.versionInfo.commitCount}"
+		""")
+
+		// act
+		val result = runVersionTaskExpectingSuccess()
+
+		// assert
+		assertTrue(result.output.contains("Commit Count: 9"))
+	}
+
+	@Test
+	fun `custom describe processor`() {
+		// arrange
+		initializeGit("v1.2").createFakeCommits(9)
+		initializeBuildGradle("""
+plugins { id 'com.zoltu.git-versioning' }
+ZoltuGitVersioning.customDescribeProcessor = { describeResult ->
+		new com.zoltu.gradle.plugin.VersionInfo("major", "minor", "count", "sha")
+}
+		""")
+
+		// act
+		val result = runVersionTaskExpectingSuccess()
+
+		// assert
+		assertTrue(result.output.contains("Version: major.minor.count"))
+	}
+
+	@Test
+	fun `custom version info toString`() {
+		// arrange
+		initializeGit("v1.2").createFakeCommits(9)
+		initializeBuildGradle("""
+plugins { id 'com.zoltu.git-versioning' }
+ZoltuGitVersioning.customVersionToString = { versionInfo ->
+		"${'$'}{versionInfo.commitCount}.${'$'}{versionInfo.minor}.${'$'}{versionInfo.major}"
+}
+		""")
+
+		// act
+		val result = runVersionTaskExpectingSuccess()
+
+		// assert
+		assertTrue(result.output.contains("Version: 9.2.1"))
+	}
+
 	private fun initializeBuildGradle(contents: String = "plugins { id 'com.zoltu.git-versioning' }") {
 		val buildFile = directory.newFile("build.gradle")!!
 		writeFile(buildFile, contents)
@@ -89,6 +219,13 @@ class FunctionalTests {
 		val commit = git.commit().setMessage("").call()
 		git.tag().setName(tag).setObjectId(commit).call()
 		return git
+	}
+
+	private fun Git.createFakeCommits(count: Int): Git {
+		(1..count).forEach {
+			commit().setMessage("").call()
+		}
+		return this
 	}
 
 	private fun runVersionTaskExpectingSuccess() = createVersionTaskRunner().build()
