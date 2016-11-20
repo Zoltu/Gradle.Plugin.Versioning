@@ -1,15 +1,14 @@
 import org.eclipse.jgit.api.Git
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class FunctionalTests {
 	@Rule @JvmField
