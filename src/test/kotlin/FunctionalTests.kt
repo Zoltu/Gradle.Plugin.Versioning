@@ -25,7 +25,7 @@ class FunctionalTests {
 
 		// assert
 		assertEquals(result.task(":version").outcome, TaskOutcome.SUCCESS)
-		assertTrue(result.output.contains("Version: 1.2.3"))
+		assertTrue(result.output.contains("Version: 1.2.0"))
 	}
 
 	@Test
@@ -83,7 +83,14 @@ class FunctionalTests {
 	fun `semantic version with tags`() {
 		// arrange
 		initializeGit("v1.2.3-beta-4.5").createFakeCommits(2)
-		initializeBuildGradle()
+		initializeBuildGradle("""
+plugins { id 'com.zoltu.git-versioning' }
+ZoltuGitVersioning.customDescribeProcessor = { describeResults ->
+		def matcher = (describeResults =~ /v(?<major>[0-9]+?)\.(?<minor>[0-9]+?)\.(?<patch>[0-9]+?)(?:\-(?<tags>[0-9A-Za-z\.\-]+))?\-(?<commitCount>[0-9]+?)\-g(?<sha>[a-zA-Z0-9]+)/)
+		matcher.matches()
+		[ major: matcher.group('major'), minor: matcher.group('minor'), commitCount: matcher.group('commitCount'), sha: matcher.group('sha'), patch: matcher.group('patch'), tags: matcher.group('tags') ]
+}
+		""")
 
 		// act
 		val result = runVersionTaskExpectingSuccess()
@@ -96,7 +103,14 @@ class FunctionalTests {
 	fun `semantic version without tags`() {
 		// arrange
 		initializeGit("v1.2.3").createFakeCommits(3)
-		initializeBuildGradle()
+		initializeBuildGradle("""
+plugins { id 'com.zoltu.git-versioning' }
+ZoltuGitVersioning.customDescribeProcessor = { describeResults ->
+		def matcher = (describeResults =~ /v(?<major>[0-9]+?)\.(?<minor>[0-9]+?)\.(?<patch>[0-9]+?)(?:\-(?<tags>[0-9A-Za-z\.\-]+))?\-(?<commitCount>[0-9]+?)\-g(?<sha>[a-zA-Z0-9]+)/)
+		matcher.matches()
+		[ major: matcher.group('major'), minor: matcher.group('minor'), commitCount: matcher.group('commitCount'), sha: matcher.group('sha'), patch: matcher.group('patch'), tags: matcher.group('tags') ]
+}
+		""")
 
 		// act
 		val result = runVersionTaskExpectingSuccess()
@@ -135,7 +149,14 @@ class FunctionalTests {
 	fun `simple version without leading v without tags`() {
 		// arrange
 		initializeGit("1.2").createFakeCommits(3)
-		initializeBuildGradle()
+		initializeBuildGradle("""
+plugins { id 'com.zoltu.git-versioning' }
+ZoltuGitVersioning.customDescribeProcessor = { describeResults ->
+		def matcher = (describeResults =~ /(?<major>[0-9]+?)\.(?<minor>[0-9]+?)(?:\-(?<tags>[0-9A-Za-z\.\-]+))?\-(?<commitCount>[0-9]+?)\-g(?<sha>[a-zA-Z0-9]+)/)
+		matcher.matches()
+		[ major: matcher.group('major'), minor: matcher.group('minor'), commitCount: matcher.group('commitCount'), sha: matcher.group('sha'), tags: matcher.group('tags') ]
+}
+		""")
 
 		// act
 		val result = runVersionTaskExpectingSuccess()
@@ -147,7 +168,14 @@ class FunctionalTests {
 	fun `simple version without leading v with tags`() {
 		// arrange
 		initializeGit("1.2-tag-1.tag2.4").createFakeCommits(3)
-		initializeBuildGradle()
+		initializeBuildGradle("""
+plugins { id 'com.zoltu.git-versioning' }
+ZoltuGitVersioning.customDescribeProcessor = { describeResults ->
+		def matcher = (describeResults =~ /(?<major>[0-9]+?)\.(?<minor>[0-9]+?)(?:\-(?<tags>[0-9A-Za-z\.\-]+))?\-(?<commitCount>[0-9]+?)\-g(?<sha>[a-zA-Z0-9]+)/)
+		matcher.matches()
+		[ major: matcher.group('major'), minor: matcher.group('minor'), commitCount: matcher.group('commitCount'), sha: matcher.group('sha'), tags: matcher.group('tags') ]
+}
+		""")
 
 		// act
 		val result = runVersionTaskExpectingSuccess()
@@ -175,11 +203,11 @@ println "Commit Count: ${'$'}{ZoltuGitVersioning.versionInfo.commitCount}"
 	@Test
 	fun `custom describe processor`() {
 		// arrange
-		initializeGit("v1.2").createFakeCommits(9)
+		initializeGit("foo.bar").createFakeCommits(9)
 		initializeBuildGradle("""
 plugins { id 'com.zoltu.git-versioning' }
 ZoltuGitVersioning.customDescribeProcessor = { describeResult ->
-		new com.zoltu.gradle.plugin.VersionInfo("major", "minor", "count", "sha")
+		[ major: "apple", minor: "orange", commitCount: "banana", sha: "tomato", patch: "pear" ]
 }
 		""")
 
@@ -187,7 +215,25 @@ ZoltuGitVersioning.customDescribeProcessor = { describeResult ->
 		val result = runVersionTaskExpectingSuccess()
 
 		// assert
-		assertTrue(result.output.contains("Version: major.minor.count"))
+		assertTrue(result.output.contains("Version: apple.orange.pear-banana"))
+	}
+
+	@Test
+	fun `invalid custom describe processor`() {
+		// arrange
+		initializeGit("v1.2").createFakeCommits(9)
+		initializeBuildGradle("""
+plugins { id 'com.zoltu.git-versioning' }
+ZoltuGitVersioning.customDescribeProcessor = { describeResult ->
+		[ major: "apple", minor: "orange", sha: "tomato", patch: "pear" ]
+}
+		""")
+
+		// act
+		val result = runVersionTaskExpectingFailure()
+
+		// assert
+		assertTrue(result.output.contains("Custom Describe Processors must return a map that includes a non null value for the key `commitCount`"))
 	}
 
 	@Test
@@ -213,7 +259,7 @@ ZoltuGitVersioning.customVersionToString = { versionInfo ->
 		writeFile(buildFile, contents)
 	}
 
-	private fun initializeGit(tag: String = "1.2.3"): Git {
+	private fun initializeGit(tag: String = "v1.2"): Git {
 		val git = Git.init().setDirectory(directory.root).call()
 		val commit = git.commit().setMessage("").call()
 		git.tag().setName(tag).setObjectId(commit).call()
