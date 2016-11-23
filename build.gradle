@@ -15,7 +15,6 @@ dependencies {
 	compile(group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.5.0.201609210915-r')
 
 	testCompile(group: 'junit', name: 'junit', version: '4.12')
-	testCompile(group: 'org.jetbrains.spek', name: 'spek', version: '1.0.9')
 }
 
 // un-set the java source directories since this is a pure kotlin project
