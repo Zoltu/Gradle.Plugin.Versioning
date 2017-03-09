@@ -49,4 +49,5 @@ ZoltuGitVersioning {
 Will produce: '1.0.0.36'.
 
 ## Notes
-Please keep in mind that any calls to `ZoltuGitVersioning.versionInfo` must occur only *after* declaring any custom processors.
+* Please keep in mind that any calls to `ZoltuGitVersioning.versionInfo` must occur only *after* declaring any custom processors.
+* If you need to reference `version` in your build.gradle file (outside of a lazily executed closure) then you will need to reference `ZoltuGitVersioning.versionInfo` somewhere *before* you reference `version`.  This plugin lazily populates `version` and referencing `ZoltuGitVersioning.versionInfo` will trigger that lazy population.  If you do nothing, it will be triggered after your build.gradle has finished processing (before any tasks are executed).
