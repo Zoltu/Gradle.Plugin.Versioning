@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
 	compile(group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: '1.0.5')
-	compile(group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.5.0.201609210915-r')
+	compile(group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '6.2.0.202206071550-r')
 
 	testCompile(group: 'junit', name: 'junit', version: '4.12')
 }
