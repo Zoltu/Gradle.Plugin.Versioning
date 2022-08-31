@@ -65,7 +65,7 @@ class GitVersioning : Plugin<Project> {
 				.build()!!
 		val git = Git.wrap(repository)!!
 		if (git.repository.allRefs.count() == 0) throw Exception("Your repository must have at least one commit in the repository for git-versioning to work.  Recommended solution: git commit")
-		return git.describe().setLong(true).call() ?: throw Exception("Your repository must have at least one tag in it for git-versioning to work.  Recommended solution: git tag v0.0")
+		return git.describe().setLong(true).setTags(true).call() ?: throw Exception("Your repository must have at least one tag in it for git-versioning to work.  Recommended solution: git tag v0.0")
 	}
 
 	private fun setProjectVersion(project: Project, versionInfo: VersionInfo) {
